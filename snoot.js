@@ -19,7 +19,7 @@ function removeSelectDefaults() {
     for (var i = 0; i < emptyBoxes.length; i++) {
         emptyBoxes[i].selectedIndex = -1;
     }
-    
+
 }
 
 // Function to set up document fragments for days of the month
@@ -70,7 +70,7 @@ function autoCheckCustom() {
     }
     // textarea has no message, uncheck the box
     else {
-       document.getElementById("custom").checked = "";
+        document.getElementById("custom").checked = "";
     }
 }
 
@@ -87,7 +87,7 @@ function copyBillingAddress() {
     }
     // duplicate address - checkboxnot checked - erase
     else {
-        for (var i = 0; i < billingInputElements.length; i++){
+        for (var i = 0; i < billingInputElements.length; i++) {
             deliveryInputElements[i + 1].value = "";
         }
         document.querySelector("#deliveryAddress select").selectedIndex = -1;
@@ -102,9 +102,42 @@ function validateAddress(fieldsetId) {
     var elementCount = inputElements.length;
     var currentElement;
     try {
-        alert("I am executing the try clause";)
-    }
-    catch (msg) {
+        // loop through input fields looking for blanks
+        for (var i = 0; i < elementCount; i++) {
+            currentElement = inputElements[i];
+            // blanks
+            if (currentElement.value === "") {
+                debugger;
+                currentElement.style.background = "rgb(255,233,233)";
+                fieldsetValidity = false;
+            }
+            // not blanks
+            else {
+                currentElement.style.background = "white";
+            }
+        }
+        // Validate select list field
+        currentElement = document.querySelectorAll("#" + fieldsetId + " select")[0];
+        if (currentElement.selectedIndex === -1) {
+            currentElement.syle.border = "1px solid red";
+            fieldsetValidity = false;
+        }
+        else {
+            currentElement.syle.border = "";
+        }
+        // action for invalid fieldset
+        if (fieldsetValidity === false) {
+            if (fieldsetId === "billingAddress") {
+                throw "Please complete all Billing Address information.";
+            } else {
+                throw "Please complete all Delivery Address information.";
+            }
+        }
+        else {
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+        }
+    } catch (msg) {
         errorDiv.style.display = "block";
         errorDiv.innerHTML = msg;
         formValidity = false;
@@ -113,32 +146,29 @@ function validateAddress(fieldsetId) {
 
 // function to validate entire form
 function validateForm(evt) {
-    alert("submit event");
-    if(evt.preventDefault) {
+    if (evt.preventDefault) {
         evt.preventDefault();
-    }
-    else {
+    } else {
         evt.returnValue = false;
     }
     formValidity = false;
-    
+
     validateAddress("billingAddress");
     validateAddress("deliveryAddress");
-    
+
     if (formValidity === true) { // form is valid
         document.getElementById("errorText").innerHTML = "";
         document.getElementById("errorText").style.display = "none";
         document.getElementsByTagName("form")[0].subit();
-    }
-    else {
+    } else {
         document.getElementById("errorText").innerHTML = "Please fix the indicated problems and then resubmit your order";
         document.getElementById("errorText").style.display = "block";
-        scroll(0,0);
+        scroll(0, 0);
     }
 }
 
 // Function that sets up page on load event
-function setUpPage(){
+function setUpPage() {
     removeSelectDefaults();
     setUpDays();
     createEventListenrs();
