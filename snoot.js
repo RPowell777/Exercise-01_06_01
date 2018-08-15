@@ -39,6 +39,9 @@ function updateDays() {
     var dates = deliveryDay.getElementsByTagName("option");
     var deliveryMonth = document.getElementById("delivMo");
     var deliveryYear = document.getElementById("delivYr");
+    if (deliveryMonth.selectedIndex === -1) {
+        return;
+    }
     var selectedMonth = deliveryMonth.options[deliveryMonth.selectedIndex].value;
     while (dates[28]) {
         deliveryDay.removeChild(dates[28]);
@@ -119,11 +122,10 @@ function validateAddress(fieldsetId) {
         // Validate select list field
         currentElement = document.querySelectorAll("#" + fieldsetId + " select")[0];
         if (currentElement.selectedIndex === -1) {
-            currentElement.syle.border = "1px solid red";
+            currentElement.style.border = "1px solid red";
             fieldsetValidity = false;
-        }
-        else {
-            currentElement.syle.border = "";
+        } else {
+            currentElement.style.border = "1px solid black";
         }
         // action for invalid fieldset
         if (fieldsetValidity === false) {
@@ -132,8 +134,7 @@ function validateAddress(fieldsetId) {
             } else {
                 throw "Please complete all Delivery Address information.";
             }
-        }
-        else {
+        } else {
             errorDiv.style.display = "none";
             errorDiv.innerHTML = "";
         }
@@ -143,6 +144,132 @@ function validateAddress(fieldsetId) {
         formValidity = false;
     }
 }
+
+//function to validate delivery date
+function validateDeliveryDate() {
+    var selectElements = document.querySelectorAll("#deliveryDate" + " select");
+    var errorDiv = document.querySelectorAll("#deliveryDate" + " .errorMessage")[0];
+    var fieldsetValidity = true;
+    var elementCount = selectElements.length;
+    var currentElement;
+    try {
+        // loop through input fields looking for blanks
+        for (var i = 0; i < elementCount; i++) {
+            currentElement = selectElements[i];
+            // blanks
+            if (currentElement.selectedIndex === -1) {
+                currentElement.style.border = "1px solid red";
+                fieldsetValidity = false;
+            }
+            // not blanks
+            else {
+                currentElement.style.border = "1px solid black";
+            }
+        }
+        // action for invalid fieldset
+        if (fieldsetValidity === false) {
+                throw "Please specify a Delivery Date.";
+            } else {
+                errorDiv.style.display = "none";
+                errorDiv.innerHTML = "";
+            }
+        } catch (msg) {
+            errorDiv.style.display = "block";
+            errorDiv.innerHTML = msg;
+            formValidity = false;
+        }
+    }
+
+// function to validate payment
+function validatePayment() {
+    var errorDiv = document.querySelectorAll("#paymentInfo" + " .errorMessage")[0];
+    var fieldsetValidity = true;
+    var ccNumElement = document.getElementById("ccNum");
+    var cvvElement = document.getElementById("cvv");
+    var selectElements = document.querySelectorAll("#paymentInfo" + " select");
+    var elementCount = selectElements.length;
+    var cards = document.getElementsByName("PaymentType");
+    var currentElement;
+    try {
+        // Valildate radio buttons one must be on
+        if (!cards[0].checked && !cards[1].checked && !cards[2].checked && !cards[3].checked){
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].style.outline = "1px solid red";
+            }
+            fieldsetValidity = false;
+        }
+        else {
+             for (var i = 0; i < cards.length; i++) {
+                cards[i].style.outline = "";
+            }    
+        }
+        
+        // validate req'd car nbr
+        if (ccNumElement.value === "") {
+            ccNumElement.style.background = "rgb(255,233,233)";
+            formValidity = false;
+        }
+        else {
+            ccNumElement.style.background = "white"
+        }
+        // Validate Expiration Date
+         for (var i = 0; i < elementCount; i++) {
+            currentElement = selectElements[i];
+            // blanks
+            if (currentElement.selectedIndex === -1) {
+                currentElement.style.border = "1px solid red";
+                fieldsetValidity = false;
+            }
+            // not blanks
+            else {
+                currentElement.style.border = "1px solid black";
+            }
+        }
+        // Validate CVV nbr
+        if (cvvElement.value === "") {
+            cvvElement.style.background = "rgb(255,233,233)";
+            formValidity = false;
+        }
+        else {
+            cvvElement.style.background = "white"
+        }
+        // action for invalid fieldset
+        if (fieldsetValidity === false) {
+                throw "Please complete all Payment info.";
+            } else {
+                errorDiv.style.display = "none";
+                errorDiv.innerHTML = "";
+            }
+        } catch (msg) {
+            errorDiv.style.display = "block";
+            errorDiv.innerHTML = msg;
+            formValidity = false;
+        }
+    }
+
+//function to validate Message
+function validateMessage() {
+    var msgBox = document.getElementById("customText");
+    var errorDiv = document.querySelectorAll("#message" + " .errorMessage")[0];
+    var fieldsetValidity = false;
+    try {
+        // validate checkbox and textarea custom message
+        if (document.getElementById("custom").checked && (msgBox.value === "" || msgBox.value === msgBox.placeholder)) {
+            throw "Please enter your Custom Message text";
+        }
+        else{
+            errorDiv.style.display = "none";
+            errorDiv.innerHTML = "";
+            msgBox.style.background = "white";
+        }
+        // validate checkbox and textarea custom message
+        } catch (msg) {
+            errorDiv.style.display = "block";
+            errorDiv.innerHTML = msg;
+            msgBox.style.background = "rgb(255,233,233)";
+            formValidity = false;
+        }
+    }
 
 // function to validate entire form
 function validateForm(evt) {
@@ -155,6 +282,9 @@ function validateForm(evt) {
 
     validateAddress("billingAddress");
     validateAddress("deliveryAddress");
+    validateDeliveryDate();
+    validatePayment();
+    validateMessage();
 
     if (formValidity === true) { // form is valid
         document.getElementById("errorText").innerHTML = "";
