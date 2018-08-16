@@ -271,6 +271,54 @@ function validateMessage() {
         }
     }
 
+//function to validate create account
+function validateCreateAccount() {
+    var errorDiv = document.querySelectorAll("#createAccount" + " .errorMessage")[0];
+    var msgBox = document.getElementById("createAccount");
+    var usernameElement = document.getElementById("username");
+    var pass1Element = document.getElementById("pass1");
+    var pass2Element = document.getElementById("pass2");
+    var invColor = "rgb(255,233,233)";
+    var passwordMismatch = false;
+    var fieldsetValidity = false;
+    usernameElement.style.background = "white";
+    pass1Element.style.background = "white";
+    pass2Element.style.background = "white";
+    errorDiv.style.display = "none";
+    errorDiv.innerHTML = "";
+    try {
+        if (usernameElement.value !== "" && pass1Element.value !== "" && pass2Element.value !== "") {
+            // one or more fields has data
+            if (pass1Element.value !== pass2Element.value) { // verify passwords match
+                 fieldsetValidity = false;
+                paswordMismatch = true;
+                throw "Passwords entered do not match, please re-enter";
+            }
+        }
+        else if (usernameElement.value === "" && pass1Element.value === "" && pass2Element.value === ""){
+            // no fields have data
+            fieldsetValidity = true;
+            paswordMismatch = true;
+        }
+        else {
+            fieldsetValidity = false;
+            throw "Please enter all fields to Create Account."
+        }
+        } catch (msg) {
+            errorDiv.style.display = "block";
+            errorDiv.innerHTML = msg;
+            pass1Element.style.background = invColor;
+            pass2Element.style.background = invColor;
+            formValidity = false;
+            if (passwordMismatch) {
+                usernameElement.style.background = "white";
+            }
+            else {
+                usernameElement.style.background = invColor;
+            }
+        }
+    }
+
 // function to validate entire form
 function validateForm(evt) {
     if (evt.preventDefault) {
@@ -285,6 +333,7 @@ function validateForm(evt) {
     validateDeliveryDate();
     validatePayment();
     validateMessage();
+    validateCreateAccount();
 
     if (formValidity === true) { // form is valid
         document.getElementById("errorText").innerHTML = "";
